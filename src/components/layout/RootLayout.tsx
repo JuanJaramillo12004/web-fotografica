@@ -1,4 +1,5 @@
 import { Link, Outlet } from 'react-router'
+import { Logo } from '@/components/brand/Logo'
 
 const publicNav = [
   { to: '/', label: 'Inicio' },
@@ -10,7 +11,11 @@ export function RootLayout() {
     <div className="flex min-h-dvh flex-col bg-white text-zinc-950">
       <header className="border-b border-zinc-200">
         <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-6 px-6">
-          <Link to="/" className="text-sm font-medium tracking-tight">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-sm font-medium tracking-tight"
+          >
+            <Logo className="size-7" />
             Web fotográfica
           </Link>
 

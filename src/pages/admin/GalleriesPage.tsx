@@ -16,7 +16,7 @@ import {
   toSlug,
   type Gallery,
 } from '@/lib/galleries'
-import { formatShootDate } from '@/lib/galleryPresentation'
+import { formatShootDate } from '@/lib/format'
 
 function describeLoadError(cause: unknown): string {
   return cause instanceof Error ? cause.message : 'No se pudieron cargar las galerías.'

@@ -89,6 +89,24 @@ Al ser privado, las URLs públicas no funcionan: la app debe pedir URLs firmadas
 (`createSignedUrl`), y Storage comprueba las políticas antes de firmarlas. Así
 una galería en borrador no se filtra aunque alguien adivine la ruta.
 
+## Usuarios
+
+`/admin/usuarios` lista todas las cuentas con su rol, estado, fecha de alta y
+último acceso. La invitación se abre en un modal y el usuario recibe un email
+para establecer su propia contraseña.
+
+El rol no se guarda en `profiles`: vive en `auth.users.app_metadata`, que solo
+puede leer el servidor. Por eso hay dos Edge Functions con `verify_jwt = true`
+que vuelven a comprobar que quien llama es administrador:
+
+| Función       | Qué hace                                                     |
+| ------------- | ------------------------------------------------------------ |
+| `invite-user` | Invita por email y asigna el rol en `app_metadata`           |
+| `list-users`  | Devuelve id, email, nombre, rol, fechas y confirmación       |
+
+El frontend las llama a través de `callAdminFunction` (`src/lib/adminFunction.ts`),
+que añade el JWT de la sesión y traduce los errores.
+
 ## Componentes comunes
 
 Los patrones que se repiten viven en `src/components/common` para no
@@ -103,6 +121,10 @@ reimplementarlos en cada página:
 | `AuthCard`      | Marco de login y establecimiento de contraseña             |
 | `BackLink`      | Vuelta a la lista desde una página de detalle              |
 | `MessagePage`   | Pantallas completas de 403 y 404                           |
+
+El panel usa además `Dialog` y `Table` (`src/components/ui`) para los modales y
+las listas tabulares. `InviteUserDialog` (`src/components/admin`) encapsula el
+formulario de invitación.
 
 Los avisos pasan por `src/lib/toast.ts`. Sonner sigue siendo el motor y cada
 llamada acepta sus opciones (`description`, `duration`, `action`, …), que tienen
@@ -124,11 +146,12 @@ iconos o estilos.
 
 ```
 src/
-  components/    auth, brand, common, layout, ui (shadcn)
+  components/    admin, auth, brand, common, layout, ui (shadcn)
   hooks/         useAuth
-  lib/           supabase, auth, galleries, gsap, toast
+  lib/           supabase, auth, galleries, gsap, toast, format, users
   pages/         públicas y /admin
   types/         auth.ts + database.ts (generado)
 supabase/
+  functions/     invite-user, list-users
   migrations/    SQL versionado
 ```

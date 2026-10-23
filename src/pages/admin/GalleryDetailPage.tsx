@@ -21,7 +21,7 @@ import {
   updateGalleryStatus,
   type Gallery,
 } from '@/lib/galleries'
-import { formatDateTime, formatShootDate } from '@/lib/galleryPresentation'
+import { formatDateTime, formatShootDate } from '@/lib/format'
 import {
   ACCEPT_ATTRIBUTE,
   deletePhoto,

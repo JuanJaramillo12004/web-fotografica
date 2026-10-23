@@ -1,107 +1,199 @@
-import { useState, type FormEvent } from 'react'
-import { toast } from '@/lib/toast'
+import { useCallback, useEffect, useState } from 'react'
+import { RefreshCw, UsersRound } from 'lucide-react'
+import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import { PageHeader } from '@/components/common/PageHeader'
+import { InviteUserDialog } from '@/components/admin/InviteUserDialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { NativeSelect } from '@/components/ui/native-select'
-import { inviteUser } from '@/lib/invite'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { useAuth } from '@/hooks/useAuth'
+import { formatDate, formatDateTime } from '@/lib/format'
+import {
+  listUsers,
+  USER_STATUS_CLASS,
+  userStatus,
+  USER_STATUS_LABEL,
+  type AdminUser,
+} from '@/lib/users'
+import { cn } from '@/lib/utils'
+
+function describeLoadError(cause: unknown): string {
+  return cause instanceof Error ? cause.message : 'No se pudieron cargar los usuarios.'
+}
 
 export function UsersPage() {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [role, setRole] = useState<'client' | 'admin'>('client')
-  const [submitting, setSubmitting] = useState(false)
+  const { user: currentUser } = useAuth()
+
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  const load = useCallback(async () => {
+    setRefreshing(true)
     setError(null)
-
-    if (!email.trim()) {
-      setError('El email es obligatorio.')
-      return
-    }
-
-    setSubmitting(true)
     try {
-      await inviteUser({ email, name, role })
-      toast.success(`Invitación enviada a ${email.trim().toLowerCase()}`)
-      setEmail('')
-      setName('')
-      setRole('client')
+      setUsers(await listUsers())
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'No se pudo enviar la invitación')
+      setError(describeLoadError(cause))
     } finally {
-      setSubmitting(false)
+      setLoading(false)
+      setRefreshing(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    // Misma pauta que en Galerías: la carga inicial no toca el estado de forma
+    // síncrona dentro del efecto, solo en los callbacks de la promesa.
+    listUsers()
+      .then((data) => {
+        if (!active) return
+        setUsers(data)
+        setLoading(false)
+      })
+      .catch((cause: unknown) => {
+        if (!active) return
+        setError(describeLoadError(cause))
+        setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   return (
     <section className="flex flex-col gap-6">
       <PageHeader
         title="Usuarios"
-        description="Invita a clientes o administradores para que se creen su propia contraseña."
+        description={
+          loading
+            ? 'Cargando…'
+            : `${users.length} usuario${users.length === 1 ? '' : 's'}`
+        }
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void load()}
+              disabled={refreshing}
+            >
+              <RefreshCw className={refreshing ? 'animate-spin' : undefined} />
+              Actualizar
+            </Button>
+            <Button type="button" onClick={() => setInviteOpen(true)}>
+              <UsersRound />
+              Invitar usuario
+            </Button>
+          </>
+        }
       />
 
-      <Card className="max-w-xl">
-        <CardHeader>
-          <CardTitle>Enviar invitación</CardTitle>
-          <CardDescription>
-            El usuario recibirá un email con un enlace para establecer su contraseña.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="invite-email">Email</Label>
-              <Input
-                id="invite-email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="cliente@ejemplo.com"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="invite-name">Nombre (opcional)</Label>
-              <Input
-                id="invite-name"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Nombre y apellidos"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="invite-role">Rol</Label>
-              <NativeSelect
-                id="invite-role"
-                value={role}
-                onChange={(event) => setRole(event.target.value as 'client' | 'admin')}
-              >
-                <option value="client">Cliente</option>
-                <option value="admin">Administrador</option>
-              </NativeSelect>
-              <p className="text-xs text-muted-foreground">
-                Los clientes solo podrán ver sus galerías asignadas. Los administradores
-                gestionan todo.
-              </p>
-            </div>
-
-            {error !== null && <ErrorAlert message={error} />}
-
-            <Button type="submit" disabled={submitting} className="self-start">
-              {submitting ? 'Enviando…' : 'Enviar invitación'}
+      {error !== null && (
+        <ErrorAlert
+          message={error}
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={() => void load()}>
+              Reintentar
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          }
+        />
+      )}
+
+      {!loading && error === null && users.length === 0 && (
+        <EmptyState
+          icon={<UsersRound className="size-6" />}
+          title="Todavía no hay usuarios"
+          description="Invita al primero para que pueda acceder a sus galerías."
+        />
+      )}
+
+      {users.length > 0 && (
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>Usuario</TableHead>
+                <TableHead>Rol</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Alta</TableHead>
+                <TableHead>Último acceso</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => {
+                const status = userStatus(user)
+                const isCurrentUser = currentUser?.id === user.id
+
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="truncate font-medium">
+                          {user.name || 'Sin nombre'}
+                          {isCurrentUser && (
+                            <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                              (tú)
+                            </span>
+                          )}
+                        </span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'border-transparent',
+                          user.role === 'admin'
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-muted text-muted-foreground',
+                        )}
+                      >
+                        {user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={cn('border-transparent', USER_STATUS_CLASS[status])}
+                      >
+                        {USER_STATUS_LABEL[status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap text-muted-foreground">
+                      {formatDate(user.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-nowrap text-muted-foreground">
+                      {formatDateTime(user.lastSignInAt)}
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      <InviteUserDialog
+        open={inviteOpen}
+        onOpenChange={setInviteOpen}
+        onInvited={() => void load()}
+      />
     </section>
   )
 }

@@ -89,6 +89,27 @@ Al ser privado, las URLs públicas no funcionan: la app debe pedir URLs firmadas
 (`createSignedUrl`), y Storage comprueba las políticas antes de firmarlas. Así
 una galería en borrador no se filtra aunque alguien adivine la ruta.
 
+## Componentes comunes
+
+Los patrones que se repiten viven en `src/components/common` para no
+reimplementarlos en cada página:
+
+| Componente      | Uso                                                        |
+| --------------- | ---------------------------------------------------------- |
+| `PageHeader`    | Título, resumen y acción principal de una página del panel |
+| `ErrorAlert`    | Errores de carga, formulario y subida (`role="alert"`)     |
+| `EmptyState`    | Listas vacías y galerías sin fotos                         |
+| `StatusBadge`   | Estado de galería con la misma etiqueta y color            |
+| `AuthCard`      | Marco de login y establecimiento de contraseña             |
+| `BackLink`      | Vuelta a la lista desde una página de detalle              |
+| `MessagePage`   | Pantallas completas de 403 y 404                           |
+
+Los avisos pasan por `src/lib/toast.ts`. Sonner sigue siendo el motor y cada
+llamada acepta sus opciones (`description`, `duration`, `action`, …), que tienen
+prioridad sobre la duración por defecto. El `<Toaster />` de
+`src/components/ui/sonner.tsx` también admite props para cambiar tema, posición,
+iconos o estilos.
+
 ## Scripts
 
 | Script            | Qué hace                                  |
@@ -103,9 +124,9 @@ una galería en borrador no se filtra aunque alguien adivine la ruta.
 
 ```
 src/
-  components/    auth, layout, ui (shadcn)
+  components/    auth, brand, common, layout, ui (shadcn)
   hooks/         useAuth
-  lib/           supabase, auth, galleries, gsap
+  lib/           supabase, auth, galleries, gsap, toast
   pages/         públicas y /admin
   types/         auth.ts + database.ts (generado)
 supabase/

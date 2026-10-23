@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { toast } from 'sonner'
+import { toast } from '@/lib/toast'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { NativeSelect } from '@/components/ui/native-select'
 import { inviteUser } from '@/lib/invite'
 
 export function UsersPage() {
@@ -38,12 +41,10 @@ export function UsersPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-medium tracking-tight">Usuarios</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Invita a clientes o administradores para que se creen su propia contraseña.
-        </p>
-      </div>
+      <PageHeader
+        title="Usuarios"
+        description="Invita a clientes o administradores para que se creen su propia contraseña."
+      />
 
       <Card className="max-w-xl">
         <CardHeader>
@@ -79,26 +80,21 @@ export function UsersPage() {
 
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="invite-role">Rol</Label>
-              <select
+              <NativeSelect
                 id="invite-role"
                 value={role}
                 onChange={(event) => setRole(event.target.value as 'client' | 'admin')}
-                className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <option value="client">Cliente</option>
                 <option value="admin">Administrador</option>
-              </select>
+              </NativeSelect>
               <p className="text-xs text-muted-foreground">
                 Los clientes solo podrán ver sus galerías asignadas. Los administradores
                 gestionan todo.
               </p>
             </div>
 
-            {error !== null && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
+            {error !== null && <ErrorAlert message={error} />}
 
             <Button type="submit" disabled={submitting} className="self-start">
               {submitting ? 'Enviando…' : 'Enviar invitación'}

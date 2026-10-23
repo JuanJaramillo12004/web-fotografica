@@ -15,7 +15,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <AuthProvider>
       <App />
-      <Toaster position="bottom-right" richColors closeButton />
+      <Toaster />
     </AuthProvider>
   </StrictMode>,
 )

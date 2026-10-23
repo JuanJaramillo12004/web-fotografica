@@ -5,22 +5,23 @@ import {
   type ChangeEvent,
   type DragEvent,
 } from 'react'
-import { Link, useParams } from 'react-router'
-import { ArrowLeft, ImageOff, Star, Trash2, Upload } from 'lucide-react'
-import { toast } from 'sonner'
+import { useParams } from 'react-router'
+import { Eye, EyeOff, ImageOff, Star, Trash2, Upload } from 'lucide-react'
+import { BackLink } from '@/components/common/BackLink'
+import { EmptyState } from '@/components/common/EmptyState'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { PageHeader } from '@/components/common/PageHeader'
+import { StatusBadge } from '@/components/common/StatusBadge'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { toast } from '@/lib/toast'
 import {
   getGallery,
   setGalleryCover,
   updateGalleryStatus,
   type Gallery,
 } from '@/lib/galleries'
-import {
-  formatDateTime,
-  formatShootDate,
-  GALLERY_STATUS_CLASS,
-  GALLERY_STATUS_LABEL,
-} from '@/lib/galleryPresentation'
+import { formatDateTime, formatShootDate } from '@/lib/galleryPresentation'
 import {
   ACCEPT_ATTRIBUTE,
   deletePhoto,
@@ -198,7 +199,7 @@ export function GalleryDetailPage() {
   }
 
   if (!galleryId) {
-    return <p className="text-sm text-destructive">Falta el identificador de la galería.</p>
+    return <ErrorAlert message="Falta el identificador de la galería." />
   }
 
   if (loading) {
@@ -208,15 +209,10 @@ export function GalleryDetailPage() {
   if (gallery === null) {
     return (
       <section className="flex flex-col gap-4">
-        <Link
-          to="/admin/galerias"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" /> Galerías
-        </Link>
-        <p className="text-sm">
-          {error ?? 'La galería no existe o no tienes permiso para verla.'}
-        </p>
+        <BackLink to="/admin/galerias">Galerías</BackLink>
+        <ErrorAlert
+          message={error ?? 'La galería no existe o no tienes permiso para verla.'}
+        />
       </section>
     )
   }
@@ -226,55 +222,47 @@ export function GalleryDetailPage() {
   return (
     <section className="flex flex-col gap-6">
       <div>
-        <Link
-          to="/admin/galerias"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-4" /> Galerías
-        </Link>
+        <BackLink to="/admin/galerias">Galerías</BackLink>
 
-        <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-medium tracking-tight">{gallery.title}</h1>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${GALLERY_STATUS_CLASS[gallery.status]}`}
-              >
-                {GALLERY_STATUS_LABEL[gallery.status]}
+        <div className="mt-3">
+          <PageHeader
+            title={
+              <span className="flex flex-wrap items-center gap-2">
+                {gallery.title}
+                <StatusBadge status={gallery.status} />
               </span>
-            </div>
-            <p className="mt-1 font-mono text-xs text-muted-foreground">/{gallery.slug}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {photos.length} foto{photos.length === 1 ? '' : 's'} · reportaje{' '}
-              {formatShootDate(gallery.shoot_date)}
-              {gallery.published_at !== null &&
-                ` · publicada el ${formatDateTime(gallery.published_at)}`}
-            </p>
-          </div>
-
-          <Button
-            type="button"
-            variant={isPublished ? 'outline' : 'default'}
-            onClick={handleToggleStatus}
-            disabled={statusPending}
-          >
-            {statusPending
-              ? 'Guardando…'
-              : isPublished
-                ? 'Volver a borrador'
-                : 'Publicar galería'}
-          </Button>
+            }
+            description={
+              <>
+                <span className="block font-mono text-xs">/{gallery.slug}</span>
+                <span className="mt-2 block text-xs">
+                  {photos.length} foto{photos.length === 1 ? '' : 's'} · reportaje{' '}
+                  {formatShootDate(gallery.shoot_date)}
+                  {gallery.published_at !== null &&
+                    ` · publicada el ${formatDateTime(gallery.published_at)}`}
+                </span>
+              </>
+            }
+            actions={
+              <Button
+                type="button"
+                variant={isPublished ? 'outline' : 'default'}
+                onClick={handleToggleStatus}
+                disabled={statusPending}
+              >
+                {isPublished ? <EyeOff /> : <Eye />}
+                {statusPending
+                  ? 'Guardando…'
+                  : isPublished
+                    ? 'Volver a borrador'
+                    : 'Publicar galería'}
+              </Button>
+            }
+          />
         </div>
       </div>
 
-      {error !== null && (
-        <div
-          role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {error}
-        </div>
-      )}
+      {error !== null && <ErrorAlert message={error} />}
 
       <div
         onDragOver={(event) => {
@@ -322,23 +310,16 @@ export function GalleryDetailPage() {
         </p>
 
         {uploadError !== null && (
-          <pre
-            role="alert"
-            className="mt-3 overflow-x-auto whitespace-pre-wrap text-xs text-destructive"
-          >
-            {uploadError}
-          </pre>
+          <ErrorAlert message={uploadError} className="mt-3" />
         )}
       </div>
 
       {photos.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center">
-          <ImageOff className="mx-auto size-6 text-muted-foreground" />
-          <p className="mt-2 text-sm font-medium">Esta galería todavía no tiene fotos</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Sube las primeras para que el cliente pueda verlas.
-          </p>
-        </div>
+        <EmptyState
+          icon={<ImageOff className="size-6" />}
+          title="Esta galería todavía no tiene fotos"
+          description="Sube las primeras para que el cliente pueda verlas."
+        />
       ) : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {photos.map((photo, index) => {
@@ -371,9 +352,9 @@ export function GalleryDetailPage() {
                 </div>
 
                 {isCover && (
-                  <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
+                  <Badge className="absolute top-2 left-2 border-transparent bg-black/60 text-white">
                     Portada
-                  </span>
+                  </Badge>
                 )}
 
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/75 to-transparent px-2 pb-1.5 pt-6">
@@ -385,43 +366,51 @@ export function GalleryDetailPage() {
                   <div className="flex items-center gap-1">
                     {pendingDelete === photo.id ? (
                       <>
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="xs"
                           onClick={() => void handleDelete(photo)}
-                          className="rounded px-1.5 py-0.5 text-xs font-medium text-red-200 hover:bg-white/10"
+                          className="text-red-200 hover:bg-white/10 hover:text-red-100"
                         >
                           Eliminar
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="xs"
                           onClick={() => setPendingDelete(null)}
-                          className="rounded px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/10"
+                          className="text-white/80 hover:bg-white/10 hover:text-white"
                         >
                           Cancelar
-                        </button>
+                        </Button>
                       </>
                     ) : (
                       <>
                         {!isCover && (
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon-sm"
                             onClick={() => void handleSetCover(photo)}
                             aria-label={`Usar la foto ${index + 1} como portada`}
                             title="Usar como portada"
-                            className="rounded p-1 text-white/80 hover:bg-white/10 hover:text-white"
+                            className="text-white/80 hover:bg-white/10 hover:text-white"
                           >
-                            <Star className="size-4" />
-                          </button>
+                            <Star />
+                          </Button>
                         )}
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon-sm"
                           onClick={() => setPendingDelete(photo.id)}
                           aria-label={`Eliminar la foto ${index + 1}`}
                           title="Eliminar"
-                          className="rounded p-1 text-white/80 hover:bg-white/10 hover:text-white"
+                          className="text-white/80 hover:bg-white/10 hover:text-white"
                         >
-                          <Trash2 className="size-4" />
-                        </button>
+                          <Trash2 />
+                        </Button>
                       </>
                     )}
                   </div>

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
-import { toast } from 'sonner'
+import { toast } from '@/lib/toast'
 import { Logo } from '@/components/brand/Logo'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'

@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { toast } from 'sonner'
+import { AuthCard } from '@/components/common/AuthCard'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
 import { getRedirectPath } from '@/lib/navigation'
+import { toast } from '@/lib/toast'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -38,55 +39,43 @@ export function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Acceso al panel</CardTitle>
-          <CardDescription>
-            Introduce tus credenciales para gestionar galerías y encargos.
-          </CardDescription>
-        </CardHeader>
+    <AuthCard
+      title="Acceso al panel"
+      description="Introduce tus credenciales para gestionar galerías y encargos."
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            name="email"
+            autoComplete="username"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                autoComplete="username"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="password">Contraseña</Label>
+          <Input
+            id="password"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </div>
+        {error !== null && <ErrorAlert message={error} />}
 
-            {error !== null && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
-
-            <Button type="submit" size="lg" disabled={submitting} className="mt-2 w-full">
-              {submitting ? 'Entrando…' : 'Entrar'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+        <Button type="submit" size="lg" disabled={submitting} className="mt-2 w-full">
+          {submitting ? 'Entrando…' : 'Entrar'}
+        </Button>
+      </form>
+    </AuthCard>
   )
 }

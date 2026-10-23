@@ -1,11 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
-import { toast } from 'sonner'
+import { AuthCard } from '@/components/common/AuthCard'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
+import { toast } from '@/lib/toast'
 
 export function SetPasswordPage() {
   const navigate = useNavigate()
@@ -62,58 +63,47 @@ export function SetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Establecer contraseña</CardTitle>
-          <CardDescription>
-            Elige una contraseña para acceder a tu cuenta de la web fotográfica.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!ready ? (
-            <p className="text-sm text-muted-foreground">Comprobando enlace…</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="new-password">Nueva contraseña</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  disabled={submitting}
-                />
-              </div>
+    <AuthCard
+      title="Establecer contraseña"
+      description="Elige una contraseña para acceder a tu cuenta de la web fotográfica."
+    >
+      {!ready ? (
+        <p className="text-sm text-muted-foreground">Comprobando enlace…</p>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="new-password">Nueva contraseña</Label>
+            <Input
+              id="new-password"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={submitting}
+            />
+          </div>
 
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="confirm-password">Repetir contraseña</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={confirm}
-                  onChange={(event) => setConfirm(event.target.value)}
-                  disabled={submitting}
-                />
-              </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="confirm-password">Repetir contraseña</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+              disabled={submitting}
+            />
+          </div>
 
-              {error !== null && (
-                <p role="alert" className="text-sm text-destructive">
-                  {error}
-                </p>
-              )}
+          {error !== null && <ErrorAlert message={error} />}
 
-              <Button type="submit" size="lg" disabled={submitting} className="mt-2 w-full">
-                {submitting ? 'Guardando…' : 'Guardar contraseña'}
-              </Button>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          <Button type="submit" size="lg" disabled={submitting} className="mt-2 w-full">
+            {submitting ? 'Guardando…' : 'Guardar contraseña'}
+          </Button>
+        </form>
+      )}
+    </AuthCard>
   )
 }

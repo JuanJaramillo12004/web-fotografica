@@ -1,6 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { toast } from 'sonner'
+import { Inbox, Plus } from 'lucide-react'
+import { toast } from '@/lib/toast'
+import { EmptyState } from '@/components/common/EmptyState'
+import { ErrorAlert } from '@/components/common/ErrorAlert'
+import { PageHeader } from '@/components/common/PageHeader'
+import { StatusBadge } from '@/components/common/StatusBadge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,11 +16,7 @@ import {
   toSlug,
   type Gallery,
 } from '@/lib/galleries'
-import {
-  formatShootDate,
-  GALLERY_STATUS_CLASS,
-  GALLERY_STATUS_LABEL,
-} from '@/lib/galleryPresentation'
+import { formatShootDate } from '@/lib/galleryPresentation'
 
 function describeLoadError(cause: unknown): string {
   return cause instanceof Error ? cause.message : 'No se pudieron cargar las galerías.'
@@ -118,20 +119,22 @@ export function GalleriesPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-medium tracking-tight">Galerías</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {loading ? 'Cargando…' : `${galleries.length} galería${galleries.length === 1 ? '' : 's'}`}
-          </p>
-        </div>
-
-        {!formOpen && (
-          <Button type="button" onClick={openForm}>
-            Nueva galería
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title="Galerías"
+        description={
+          loading
+            ? 'Cargando…'
+            : `${galleries.length} galería${galleries.length === 1 ? '' : 's'}`
+        }
+        actions={
+          formOpen ? undefined : (
+            <Button type="button" onClick={openForm}>
+              <Plus />
+              Nueva galería
+            </Button>
+          )
+        }
+      />
 
       {formOpen && (
         <Card>
@@ -181,11 +184,7 @@ export function GalleriesPage() {
                 </div>
               </div>
 
-              {formError !== null && (
-                <p role="alert" className="text-sm text-destructive">
-                  {formError}
-                </p>
-              )}
+              {formError !== null && <ErrorAlert message={formError} />}
 
               <div className="flex gap-2">
                 <Button type="submit" disabled={submitting}>
@@ -206,27 +205,22 @@ export function GalleriesPage() {
       )}
 
       {error !== null && (
-        <div
-          role="alert"
-          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3"
-        >
-          <p className="text-sm text-destructive">{error}</p>
-          <Button type="button" variant="outline" size="sm" onClick={retry}>
-            Reintentar
-          </Button>
-        </div>
+        <ErrorAlert
+          message={error}
+          action={
+            <Button type="button" variant="outline" size="sm" onClick={retry}>
+              Reintentar
+            </Button>
+          }
+        />
       )}
 
       {!loading && error === null && galleries.length === 0 && (
-        <Card className="border border-dashed border-border bg-transparent ring-0">
-          <CardContent className="flex flex-col items-start gap-2 py-8">
-            <p className="text-sm font-medium">Todavía no hay galerías</p>
-            <p className="max-w-prose text-sm text-muted-foreground">
-              Crea la primera para empezar a subir fotos. Nacerá como borrador: solo será
-              visible desde la web pública cuando la publiques.
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Inbox className="size-6" />}
+          title="Todavía no hay galerías"
+          description="Crea la primera para empezar a subir fotos. Nacerá como borrador: solo será visible desde la web pública cuando la publiques."
+        />
       )}
 
       {galleries.length > 0 && (
@@ -248,11 +242,7 @@ export function GalleriesPage() {
                   <span className="text-xs text-muted-foreground">
                     {formatShootDate(gallery.shoot_date)}
                   </span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${GALLERY_STATUS_CLASS[gallery.status]}`}
-                  >
-                    {GALLERY_STATUS_LABEL[gallery.status]}
-                  </span>
+                  <StatusBadge status={gallery.status} />
                 </div>
               </Link>
             </li>

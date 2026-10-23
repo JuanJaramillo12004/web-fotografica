@@ -5,13 +5,9 @@ interface LogoProps {
 }
 
 /**
- * Marca temporal mientras llega el logotipo definitivo.
- *
- * Se importa el SVG de `src/assets` (Vite lo procesa y le pone hash en el
- * build), así que reemplazar el archivo actualiza la marca en toda la app.
- * El SVG es negro: `dark:invert` lo deja legible sobre fondos oscuros.
- *
- * Es decorativo; el nombre accesible lo aporta el texto que lo acompaña.
+ * Logotipo de la marca.
+ * Usa `currentColor` para poder teñirse con las utilidades de Tailwind
+ * (`text-primary`, `text-foreground`, ...).
  */
 export function Logo({ className }: LogoProps) {
   return (
@@ -20,7 +16,7 @@ export function Logo({ className }: LogoProps) {
       alt=""
       aria-hidden="true"
       draggable={false}
-      className={`select-none dark:invert ${className ?? ''}`}
+      className={`select-none ${className ?? ''}`}
     />
   )
 }

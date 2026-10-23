@@ -24,12 +24,9 @@ export function AdminLayout() {
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-10 lg:flex-row">
       <aside className="lg:w-56 lg:shrink-0">
         <div className="flex items-center gap-2">
-          <Logo className="size-6 text-primary" />
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Panel
-          </p>
+          <Logo className="size-7 text-primary" />
+          <p className="text-sm font-medium text-foreground">Web fotográfica</p>
         </div>
-        <p className="mt-1 text-sm font-medium">{user?.name}</p>
         <p className="text-xs text-muted-foreground">
           {user?.email} · {user?.role}
         </p>

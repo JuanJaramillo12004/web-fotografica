@@ -43,8 +43,8 @@ export function RootLayout() {
             to="/"
             className="flex items-center gap-2 text-sm font-medium tracking-tight transition-opacity hover:opacity-70"
           >
-            <Logo className="size-6" />
-            <span>Web fotográfica</span>
+            <Logo className="size-8 text-primary" />
+            <span className="text-base font-medium tracking-tight">Web fotográfica</span>
           </Link>
 
           <nav

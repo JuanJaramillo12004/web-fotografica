@@ -235,7 +235,7 @@ export function HomePage() {
             <div data-hero-copy className="mt-9 flex flex-wrap items-center gap-5">
               <Link
                 to="/login"
-                className="inline-flex h-10 items-center justify-center border border-foreground bg-foreground px-5 text-sm font-medium text-background transition-colors hover:bg-transparent hover:text-foreground"
+                className="inline-flex h-10 items-center justify-center border border-primary bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-transparent hover:text-primary"
               >
                 Acceder a tu galería
               </Link>

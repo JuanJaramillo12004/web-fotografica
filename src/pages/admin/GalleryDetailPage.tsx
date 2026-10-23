@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { PhotoPreviewDialog } from '@/components/admin/PhotoPreviewDialog'
 import { toast } from '@/lib/toast'
 import {
   getGallery,
@@ -50,6 +51,7 @@ export function GalleryDetailPage() {
   const [dragging, setDragging] = useState(false)
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const [statusPending, setStatusPending] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -335,13 +337,18 @@ export function GalleryDetailPage() {
                 key={photo.id}
                 className="group relative overflow-hidden rounded-lg border border-border bg-muted"
               >
-                <div className="aspect-square">
+                <button
+                  type="button"
+                  onClick={() => setPreviewIndex(index)}
+                  aria-label={`Ver la foto ${index + 1} en grande`}
+                  className="block aspect-square w-full cursor-zoom-in overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                >
                   {url !== undefined ? (
                     <img
                       src={url}
                       alt={photo.alt ?? `Foto ${index + 1} de ${gallery.title}`}
                       loading="lazy"
-                      className="size-full object-cover"
+                      className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                     />
                   ) : (
                     <div className="flex size-full flex-col items-center justify-center gap-1 text-muted-foreground">
@@ -349,7 +356,7 @@ export function GalleryDetailPage() {
                       <span className="text-xs">Sin vista previa</span>
                     </div>
                   )}
-                </div>
+                </button>
 
                 {isCover && (
                   <Badge className="absolute top-2 left-2 border-transparent bg-black/60 text-white">
@@ -387,6 +394,17 @@ export function GalleryDetailPage() {
                       </>
                     ) : (
                       <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setPreviewIndex(index)}
+                          aria-label={`Ampliar la foto ${index + 1}`}
+                          title="Ampliar"
+                          className="text-white/80 hover:bg-white/10 hover:text-white"
+                        >
+                          <Eye />
+                        </Button>
                         {!isCover && (
                           <Button
                             type="button"
@@ -420,6 +438,15 @@ export function GalleryDetailPage() {
           })}
         </ul>
       )}
+
+      <PhotoPreviewDialog
+        photos={photos}
+        urls={urls}
+        galleryTitle={gallery.title}
+        coverPhotoId={gallery.cover_photo_id}
+        index={previewIndex}
+        onIndexChange={setPreviewIndex}
+      />
     </section>
   )
 }

@@ -64,7 +64,7 @@ export function RootLayout() {
 
             <Link
               to="/login"
-              className="inline-flex h-9 items-center justify-center border border-foreground px-4 text-sm font-medium transition-colors hover:bg-foreground hover:text-background"
+              className="inline-flex h-9 items-center justify-center border border-primary px-4 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               Acceder
             </Link>

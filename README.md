@@ -124,7 +124,9 @@ reimplementarlos en cada página:
 
 El panel usa además `Dialog` y `Table` (`src/components/ui`) para los modales y
 las listas tabulares. `InviteUserDialog` (`src/components/admin`) encapsula el
-formulario de invitación.
+formulario de invitación. `PhotoPreviewDialog` es el visor de fotos: se abre con
+el ojo de cada miniatura, cambia de foto con las flechas y permite ver el tamaño
+real dentro del propio visor, sin salir a la URL de Storage.
 
 Los avisos pasan por `src/lib/toast.ts`. Sonner sigue siendo el motor y cada
 llamada acepta sus opciones (`description`, `duration`, `action`, …), que tienen
@@ -135,9 +137,11 @@ iconos o estilos.
 ## Diseño y movimiento
 
 La web pública es una landing editorial: tipografía grande, aire y composición
-asimétrica, sin gradientes ni adornos. Los colores salen siempre de los tokens
-de `src/index.css` (`--background`, `--foreground`, `--muted`, `--border`…), así
-que el tema oscuro y cualquier ajuste futuro se heredan sin tocar las páginas.
+asimétrica, sin gradientes ni adornos. La paleta es **marfil cálido + azul
+tinta**, con el azul petróleo como acento en botones y enlaces principales. Los
+colores salen siempre de los tokens de `src/index.css` (`--background`,
+`--foreground`, `--muted`, `--border`…), así que el tema oscuro y cualquier
+ajuste futuro se heredan sin tocar las páginas.
 
 `src/lib/gsap.ts` es el único punto de entrada de GSAP y registra una sola vez
 `useGSAP` y `ScrollTrigger`. La home usa GSAP con `ScrollTrigger` para el reveal

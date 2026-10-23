@@ -3,20 +3,21 @@ import { Toaster as Sonner, type ToasterProps } from "sonner"
 import type { CSSProperties } from "react"
 
 /**
- * Wrapper de sonner adaptado a esta app (sin `next-themes`).
+ * Wrapper de sonner adaptado al tono editorial de la app.
  *
- * El componente que genera shadcn usa `useTheme()` de next-themes, que aquí no
- * existe. Mientras no haya selector de tema propio usamos `system`, que ya
- * respeta la preferencia del sistema operativo. Cuando añadamos toggle de
- * tema, basta con pasar `theme` por props.
+ * Usa los tokens semánticos para mantener coherencia con el resto de la UI.
+ * Los toasts se cierran solos por tiempo por defecto, aunque también se puede
+ * cerrar manualmente con el botón.
  */
 export function Toaster(props: ToasterProps) {
   return (
     <Sonner
       theme="system"
       position="bottom-right"
-      richColors
       closeButton
+      gap={10}
+      expand={false}
+      visibleToasts={4}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
@@ -25,19 +26,29 @@ export function Toaster(props: ToasterProps) {
         error: <OctagonXIcon className="size-4" />,
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)",
-        } as CSSProperties
-      }
       toastOptions={{
+        duration: 4000,
         classNames: {
-          toast: "cn-toast",
+          toast:
+            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:shadow-sm group-[.toaster]:rounded-lg group-[.toaster]:px-4 group-[.toaster]:py-3",
+          title: "group-[.toast]:text-sm group-[.toast]:font-medium",
+          description: "group-[.toast]:text-sm group-[.toast]:text-muted-foreground",
+          actionButton:
+            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground group-[.toast]:rounded-md group-[.toast]:text-sm",
+          cancelButton:
+            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded-md group-[.toast]:text-sm",
+          closeButton:
+            "group-[.toast]:border-border group-[.toast]:bg-transparent group-[.toast]:text-muted-foreground hover:group-[.toast]:text-foreground",
         },
       }}
+      style={
+        {
+          "--normal-bg": "var(--background)",
+          "--normal-text": "var(--foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "calc(var(--radius) - 2px)",
+        } as CSSProperties
+      }
       {...props}
     />
   )

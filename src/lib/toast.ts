@@ -6,8 +6,8 @@ import type { ReactNode } from 'react'
  *
  * Sonner sigue siendo el motor y cada llamada acepta todas sus opciones
  * (`description`, `duration`, `action`, `id`…), así que se puede personalizar
- * sin salir del wrapper. Aquí solo se define la duración por defecto de cada
- * tipo; lo que pase la llamada tiene prioridad.
+ * sin salir del wrapper. Los toasts se auto-cierran con un delay coherente
+ * con el tono minimal/editorial de la UI.
  */
 export type ToastOptions = ExternalToast
 
@@ -20,13 +20,13 @@ export const toast = {
     return sonner.success(message, merge({ duration: 4000 }, options))
   },
   error(message: ReactNode, options?: ToastOptions) {
-    return sonner.error(message, merge({ duration: 6000 }, options))
+    return sonner.error(message, merge({ duration: 5000 }, options))
   },
   warning(message: ReactNode, options?: ToastOptions) {
-    return sonner.warning(message, merge({ duration: 6000 }, options))
+    return sonner.warning(message, merge({ duration: 5000 }, options))
   },
   info(message: ReactNode, options?: ToastOptions) {
-    return sonner.info(message, merge({ duration: 5000 }, options))
+    return sonner.info(message, merge({ duration: 4000 }, options))
   },
 
   // El resto de la API de Sonner queda disponible sin perder los defaults.

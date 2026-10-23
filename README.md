@@ -1,75 +1,113 @@
-# React + TypeScript + Vite
+# web-fotografica
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Web del estudio fotográfico: galerías privadas por cliente y galerías públicas.
 
-Currently, two official plugins are available:
+- **React 19** + **TypeScript** + **Vite 8**
+- **Tailwind CSS v4** + **shadcn/ui** (preset Nova)
+- **React Router 8** con guards por rol
+- **GSAP** para animaciones
+- **Supabase** (Auth + Postgres + Storage)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Puesta en marcha
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+cp .env.example .env.local   # y rellena los valores
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Variables necesarias:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Variable                | Dónde se obtiene                                   |
+| ----------------------- | -------------------------------------------------- |
+| `VITE_SUPABASE_URL`     | Dashboard → Project Settings → API, o `supabase projects list` |
+| `VITE_SUPABASE_ANON_KEY`| Dashboard → Project Settings → API                 |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+> **Windows / PowerShell:** escribe `.env.local` en UTF-8 **sin BOM**. PowerShell 5.1
+> añade BOM con `-Encoding utf8` y Vite entonces ignora el fichero entero sin
+> avisar. Usa `[System.IO.File]::WriteAllText($ruta, $texto, (New-Object System.Text.UTF8Encoding($false)))`.
 
+La `anon key` es pública por diseño: lo que protege los datos son las políticas
+RLS de Postgres. La `service_role` key **nunca** debe llegar al navegador.
+
+## Base de datos
+
+El esquema vive en `supabase/migrations/`:
+
+| Tabla       | Contenido                                                        |
+| ----------- | ---------------------------------------------------------------- |
+| `profiles`  | Datos de presentación de cada usuario de `auth.users`            |
+| `galleries` | Galerías. `status`: `draft`, `published` o `archived`            |
+| `photos`    | Metadatos de las imágenes. Los bytes viven en Storage            |
+
+Reglas de acceso (RLS):
+
+- **Anónimo**: solo lectura de galerías publicadas y de sus fotos.
+- **Cliente**: además, sus propias galerías (aunque estén en borrador).
+- **Admin**: lectura y escritura de todo. La escritura está reservada al admin.
+
+El rol se lee de `auth.users.app_metadata.role`, no de `user_metadata`: solo el
+servidor puede escribir `app_metadata`, así que un usuario no puede ascenderse a
+admin desde el navegador.
+
+### Aplicar migraciones
+
+Con la CLI vinculada y la contraseña de la base de datos:
+
+```bash
+supabase link --project-ref <ref>
+supabase db push
+```
+
+Sin contraseña (solo si tienes un token de Management API) se puede ejecutar el
+SQL directamente:
+
+```bash
+supabase db query --linked -f supabase/migrations/<archivo>.sql
+```
+
+Las migraciones son idempotentes (`if not exists`, `drop policy if exists`), así
+que volver a aplicarlas no rompe nada.
+
+### Regenerar tipos
+
+Tras cualquier cambio de esquema:
+
+```bash
+npm run db:types
+```
+
+Escribe `src/types/database.ts` a partir del esquema real. El cliente de
+`src/lib/supabase.ts` está tipado con `Database`, así que tablas, columnas y
+enums se comprueban en tiempo de compilación.
+
+## Storage
+
+Bucket `photos`, **privado**. Convención de ruta: `<gallery_id>/<archivo>`.
+
+Al ser privado, las URLs públicas no funcionan: la app debe pedir URLs firmadas
+(`createSignedUrl`), y Storage comprueba las políticas antes de firmarlas. Así
+una galería en borrador no se filtra aunque alguien adivine la ruta.
+
+## Scripts
+
+| Script            | Qué hace                                  |
+| ----------------- | ----------------------------------------- |
+| `npm run dev`     | Servidor de desarrollo                    |
+| `npm run build`   | Typecheck + build de producción           |
+| `npm run lint`    | ESLint                                    |
+| `npm run preview` | Sirve el build                            |
+| `npm run db:types`| Regenera los tipos desde Supabase         |
+
+## Estructura
+
+```
+src/
+  components/    auth, layout, ui (shadcn)
+  hooks/         useAuth
+  lib/           supabase, auth, galleries, gsap
+  pages/         públicas y /admin
+  types/         auth.ts + database.ts (generado)
+supabase/
+  migrations/    SQL versionado
 ```

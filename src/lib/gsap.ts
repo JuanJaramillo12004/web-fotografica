@@ -1,7 +1,8 @@
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(useGSAP)
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 /**
  * Respeta la preferencia de accesibilidad del sistema. Toda animación nueva
@@ -14,10 +15,8 @@ export function prefersReducedMotion(): boolean {
 /**
  * Punto único de entrada de GSAP.
  *
- * Plugins como ScrollTrigger o SplitText se registran aquí cuando se usen, para
- * no arrastrar su peso al bundle hasta que hagan falta:
- *
- *   import { ScrollTrigger } from 'gsap/ScrollTrigger'
- *   gsap.registerPlugin(ScrollTrigger)
+ * Los plugins compartidos se registran aquí una sola vez. Cualquier página que
+ * los necesite los importa desde este módulo para no registrarlos por
+ * duplicado ni arrastrar dependencias sin uso.
  */
-export { gsap, useGSAP }
+export { gsap, ScrollTrigger, useGSAP }

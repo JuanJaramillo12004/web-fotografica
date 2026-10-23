@@ -132,6 +132,23 @@ prioridad sobre la duración por defecto. El `<Toaster />` de
 `src/components/ui/sonner.tsx` también admite props para cambiar tema, posición,
 iconos o estilos.
 
+## Diseño y movimiento
+
+La web pública es una landing editorial: tipografía grande, aire y composición
+asimétrica, sin gradientes ni adornos. Los colores salen siempre de los tokens
+de `src/index.css` (`--background`, `--foreground`, `--muted`, `--border`…), así
+que el tema oscuro y cualquier ajuste futuro se heredan sin tocar las páginas.
+
+`src/lib/gsap.ts` es el único punto de entrada de GSAP y registra una sola vez
+`useGSAP` y `ScrollTrigger`. La home usa GSAP con `ScrollTrigger` para el reveal
+de secciones y el parallax de las imágenes; si el sistema tiene activado
+*prefers-reduced-motion*, no se registra ninguna animación y el desplazamiento a
+anclas es instantáneo.
+
+Las secciones del home se enlazan por hash (`/#trabajos`, `/#estudio`). El
+`RootLayout` intercepta esos enlaces para hacer scroll suave cuando ya estás en
+la home y navegar primero cuando vienes de otra ruta.
+
 ## Scripts
 
 | Script            | Qué hace                                  |

@@ -17,16 +17,16 @@ function merge(defaults: ExternalToast, options?: ToastOptions): ExternalToast {
 
 export const toast = {
   success(message: ReactNode, options?: ToastOptions) {
-    return sonner.success(message, merge({ duration: 4000 }, options))
+    return sonner.success(message, merge({ duration: 3000 }, options))
   },
   error(message: ReactNode, options?: ToastOptions) {
-    return sonner.error(message, merge({ duration: 5000 }, options))
+    return sonner.error(message, merge({ duration: 3500 }, options))
   },
   warning(message: ReactNode, options?: ToastOptions) {
-    return sonner.warning(message, merge({ duration: 5000 }, options))
+    return sonner.warning(message, merge({ duration: 3500 }, options))
   },
   info(message: ReactNode, options?: ToastOptions) {
-    return sonner.info(message, merge({ duration: 4000 }, options))
+    return sonner.info(message, merge({ duration: 3000 }, options))
   },
 
   // El resto de la API de Sonner queda disponible sin perder los defaults.

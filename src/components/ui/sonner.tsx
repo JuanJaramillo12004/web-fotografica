@@ -13,8 +13,8 @@ export function Toaster(props: ToasterProps) {
   return (
     <Sonner
       theme="system"
-      position="bottom-right"
-      closeButton
+      position="bottom-center"
+      closeButton={false}
       gap={10}
       expand={false}
       visibleToasts={4}
@@ -27,7 +27,7 @@ export function Toaster(props: ToasterProps) {
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
       toastOptions={{
-        duration: 4000,
+        duration: 3200,
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:shadow-sm group-[.toaster]:rounded-lg group-[.toaster]:px-4 group-[.toaster]:py-3",
@@ -37,8 +37,6 @@ export function Toaster(props: ToasterProps) {
             "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground group-[.toast]:rounded-md group-[.toast]:text-sm",
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded-md group-[.toast]:text-sm",
-          closeButton:
-            "group-[.toast]:border-border group-[.toast]:bg-transparent group-[.toast]:text-muted-foreground hover:group-[.toast]:text-foreground",
         },
       }}
       style={

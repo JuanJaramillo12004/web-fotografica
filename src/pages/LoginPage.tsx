@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { useAuth } from '../hooks/useAuth'
 import { DEMO_CREDENTIALS } from '../lib/auth'
 import { getRedirectPath } from '../lib/navigation'
@@ -22,6 +23,7 @@ export function LoginPage() {
     const result = await login({ email, password })
 
     if (result.ok) {
+      toast.success(`Bienvenido, ${result.session.user.name}`)
       // Al autenticarse, PublicRoute también redirigiría; hacerlo aquí
       // permite respetar la ruta de origen sin parpadeo.
       navigate(getRedirectPath(location.state) ?? '/admin', { replace: true })

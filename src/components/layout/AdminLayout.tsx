@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { useAuth } from '../../hooks/useAuth'
 
 const adminNav = [
@@ -13,6 +14,7 @@ export function AdminLayout() {
   function handleLogout() {
     logout()
     navigate('/login', { replace: true })
+    toast.success('Sesión cerrada')
   }
 
   return (

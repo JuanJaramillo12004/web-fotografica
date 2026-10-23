@@ -4,6 +4,7 @@ import { PublicRoute } from './components/auth/PublicRoute'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { RootLayout } from './components/layout/RootLayout'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
+import { GalleryDetailPage } from './pages/admin/GalleryDetailPage'
 import { GalleriesPage } from './pages/admin/GalleriesPage'
 import { ForbiddenPage } from './pages/ForbiddenPage'
 import { HomePage } from './pages/HomePage'
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <AdminDashboardPage /> },
               { path: 'galerias', element: <GalleriesPage /> },
+              { path: 'galerias/:galleryId', element: <GalleryDetailPage /> },
             ],
           },
         ],

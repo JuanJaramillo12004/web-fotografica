@@ -65,3 +65,50 @@ export async function createGallery(input: NewGalleryInput): Promise<Gallery> {
 
   return data
 }
+
+/**
+ * Devuelve `null` si la galería no existe **o si RLS no deja verla**. Para el
+ * cliente ambos casos son el mismo: no hay nada que enseñar.
+ */
+export async function getGallery(id: string): Promise<Gallery | null> {
+  const { data, error } = await supabase
+    .from('galleries')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error !== null) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export async function updateGalleryStatus(
+  id: string,
+  status: GalleryStatus,
+): Promise<Gallery> {
+  const { data, error } = await supabase
+    .from('galleries')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error !== null) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export async function setGalleryCover(id: string, photoId: string): Promise<void> {
+  const { error } = await supabase
+    .from('galleries')
+    .update({ cover_photo_id: photoId })
+    .eq('id', id)
+
+  if (error !== null) {
+    throw new Error(error.message)
+  }
+}

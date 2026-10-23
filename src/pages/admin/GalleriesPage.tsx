@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,29 +10,12 @@ import {
   listGalleries,
   toSlug,
   type Gallery,
-  type GalleryStatus,
 } from '@/lib/galleries'
-
-const STATUS_LABEL: Record<GalleryStatus, string> = {
-  draft: 'Borrador',
-  published: 'Publicada',
-  archived: 'Archivada',
-}
-
-const STATUS_CLASS: Record<GalleryStatus, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  published: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-  archived: 'bg-amber-500/10 text-amber-700 dark:text-amber-400',
-}
-
-const dateFormat = new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' })
-
-function formatDate(value: string | null): string {
-  if (value === null) return '—'
-  // `shoot_date` llega como 'YYYY-MM-DD'; añadir la hora evita que `Date` lo
-  // interprete como UTC y muestre el día anterior en zonas negativas.
-  return dateFormat.format(new Date(`${value}T00:00:00`))
-}
+import {
+  formatShootDate,
+  GALLERY_STATUS_CLASS,
+  GALLERY_STATUS_LABEL,
+} from '@/lib/galleryPresentation'
 
 function describeLoadError(cause: unknown): string {
   return cause instanceof Error ? cause.message : 'No se pudieron cargar las galerías.'
@@ -248,25 +232,29 @@ export function GalleriesPage() {
       {galleries.length > 0 && (
         <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border">
           {galleries.map((gallery) => (
-            <li
-              key={gallery.id}
-              className="flex flex-wrap items-center justify-between gap-3 bg-card px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{gallery.title}</p>
-                <p className="mt-0.5 font-mono text-xs text-muted-foreground">/{gallery.slug}</p>
-              </div>
+            <li key={gallery.id}>
+              <Link
+                to={`/admin/galerias/${gallery.id}`}
+                className="flex flex-wrap items-center justify-between gap-3 bg-card px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{gallery.title}</p>
+                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                    /{gallery.slug}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-4">
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(gallery.shoot_date)}
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_CLASS[gallery.status]}`}
-                >
-                  {STATUS_LABEL[gallery.status]}
-                </span>
-              </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-muted-foreground">
+                    {formatShootDate(gallery.shoot_date)}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${GALLERY_STATUS_CLASS[gallery.status]}`}
+                  >
+                    {GALLERY_STATUS_LABEL[gallery.status]}
+                  </span>
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

@@ -1,0 +1,20 @@
+# Normaliza los saltos de línea a LF en el repositorio y en el working copy,
+# independientemente de core.autocrlf. Evita diffs fantasma entre Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Ficheros binarios: Git nunca debe tocarlos ni intentar fusionarlos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+
+# Lockfiles: tratar como generados, no colapsar en diffs
+package-lock.json -diff linguist-generated

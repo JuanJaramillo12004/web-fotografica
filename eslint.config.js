@@ -19,4 +19,13 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Componentes de shadcn/ui: son código vendorizado y varios exportan
+    // constantes junto al componente (p. ej. `buttonVariants`). La regla de
+    // Fast Refresh solo aporta ruido aquí.
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

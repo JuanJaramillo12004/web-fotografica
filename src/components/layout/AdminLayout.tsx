@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
 import { toast } from 'sonner'
-import { useAuth } from '../../hooks/useAuth'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
 
 const adminNav = [
   { to: '/admin', label: 'Resumen', end: true },
@@ -20,9 +21,9 @@ export function AdminLayout() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-10 lg:flex-row">
       <aside className="lg:w-56 lg:shrink-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Panel</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Panel</p>
         <p className="mt-1 text-sm font-medium">{user?.name}</p>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-muted-foreground">
           {user?.email} · {user?.role}
         </p>
 
@@ -35,8 +36,8 @@ export function AdminLayout() {
               className={({ isActive }) =>
                 `rounded-md px-3 py-2 text-sm transition-colors ${
                   isActive
-                    ? 'bg-zinc-950 text-white'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`
               }
             >
@@ -45,13 +46,15 @@ export function AdminLayout() {
           ))}
         </nav>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={handleLogout}
-          className="mt-6 rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100"
+          className="mt-6 w-full"
         >
           Cerrar sesión
-        </button>
+        </Button>
       </aside>
 
       <div className="min-w-0 flex-1">

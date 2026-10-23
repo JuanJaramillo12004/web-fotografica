@@ -1,9 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { toast } from 'sonner'
-import { useAuth } from '../hooks/useAuth'
-import { DEMO_CREDENTIALS } from '../lib/auth'
-import { getRedirectPath } from '../lib/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuth } from '@/hooks/useAuth'
+import { DEMO_CREDENTIALS } from '@/lib/auth'
+import { getRedirectPath } from '@/lib/navigation'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -36,64 +40,60 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
-      <h1 className="text-2xl font-medium tracking-tight">Acceso al panel</h1>
-      <p className="mt-2 text-sm text-zinc-500">
-        Introduce tus credenciales para gestionar galerías y encargos.
-      </p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Acceso al panel</CardTitle>
+          <CardDescription>
+            Introduce tus credenciales para gestionar galerías y encargos.
+          </CardDescription>
+        </CardHeader>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4" noValidate>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            autoComplete="username"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-950"
-          />
-        </div>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none transition-colors focus:border-zinc-950"
-          />
-        </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="password">Contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </div>
 
-        {error !== null && (
-          <p role="alert" className="text-sm text-red-600">
-            {error}
-          </p>
-        )}
+            {error !== null && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="mt-2 rounded-md bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          {submitting ? 'Entrando…' : 'Entrar'}
-        </button>
-      </form>
+            <Button type="submit" size="lg" disabled={submitting} className="mt-2 w-full">
+              {submitting ? 'Entrando…' : 'Entrar'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className="mt-8 rounded-md border border-dashed border-zinc-300 p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+      <div className="mt-6 rounded-lg border border-dashed border-border p-4">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Credenciales de prueba
         </p>
-        <ul className="mt-2 flex flex-col gap-1 text-xs text-zinc-600">
+        <ul className="mt-2 flex flex-col gap-1 text-xs text-muted-foreground">
           {DEMO_CREDENTIALS.map((account) => (
             <li key={account.email} className="font-mono">
               {account.role}: {account.email} / {account.password}

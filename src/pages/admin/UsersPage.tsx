@@ -3,6 +3,7 @@ import { RefreshCw, UsersRound } from 'lucide-react'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorAlert } from '@/components/common/ErrorAlert'
 import { PageHeader } from '@/components/common/PageHeader'
+import { TableSkeleton } from '@/components/common/TableSkeleton'
 import { InviteUserDialog } from '@/components/admin/InviteUserDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -54,8 +55,6 @@ export function UsersPage() {
   useEffect(() => {
     let active = true
 
-    // Misma pauta que en Galerías: la carga inicial no toca el estado de forma
-    // síncrona dentro del efecto, solo en los callbacks de la promesa.
     listUsers()
       .then((data) => {
         if (!active) return
@@ -87,7 +86,10 @@ export function UsersPage() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => void load()}
+              onClick={(event) => {
+                event.preventDefault()
+                void load()
+              }}
               disabled={refreshing}
             >
               <RefreshCw className={refreshing ? 'animate-spin' : undefined} />
@@ -112,6 +114,8 @@ export function UsersPage() {
         />
       )}
 
+      {loading && error === null && <TableSkeleton rows={6} />}
+
       {!loading && error === null && users.length === 0 && (
         <EmptyState
           icon={<UsersRound className="size-6" />}
@@ -120,7 +124,7 @@ export function UsersPage() {
         />
       )}
 
-      {users.length > 0 && (
+      {!loading && error === null && users.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <Table>
             <TableHeader>

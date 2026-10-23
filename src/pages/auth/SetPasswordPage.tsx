@@ -44,13 +44,16 @@ export function SetPasswordPage() {
 
     setSubmitting(true)
     try {
-      const { error: updateError } = await supabase.auth.updateUser({ password })
+      const { data, error: updateError } = await supabase.auth.updateUser({ password })
       if (updateError) {
         setError(updateError.message)
         return
       }
-      toast.success('Contraseña guardada. Ya puedes acceder al panel.')
-      navigate('/admin', { replace: true })
+      toast.success('Contraseña guardada. Ya puedes acceder.')
+      // Los clientes todavía no tienen panel propio: el panel es solo para
+      // administradores y ProtectedRoute les devolvería un 403.
+      const isAdmin = data.user?.app_metadata?.role === 'admin'
+      navigate(isAdmin ? '/admin' : '/', { replace: true })
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo guardar la contraseña')
     } finally {
@@ -64,7 +67,7 @@ export function SetPasswordPage() {
         <CardHeader>
           <CardTitle className="text-xl">Establecer contraseña</CardTitle>
           <CardDescription>
-            Elige una contraseña para acceder al panel de la web fotográfica.
+            Elige una contraseña para acceder a tu cuenta de la web fotográfica.
           </CardDescription>
         </CardHeader>
         <CardContent>

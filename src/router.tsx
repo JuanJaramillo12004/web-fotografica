@@ -6,10 +6,12 @@ import { RootLayout } from './components/layout/RootLayout'
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage'
 import { GalleryDetailPage } from './pages/admin/GalleryDetailPage'
 import { GalleriesPage } from './pages/admin/GalleriesPage'
+import { UsersPage } from './pages/admin/UsersPage'
 import { ForbiddenPage } from './pages/ForbiddenPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { SetPasswordPage } from './pages/auth/SetPasswordPage'
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +27,10 @@ export const router = createBrowserRouter([
         children: [{ path: 'login', element: <LoginPage /> }],
       },
 
+      // Llegan con el link de invitación para establecer su contraseña.
+      // Aunque no tengan sesión persistida, Supabase la crea al procesar el token.
+      { path: 'auth/establecer-contrasena', element: <SetPasswordPage /> },
+
       // Exige sesión y, además, rol `admin`. Las hijas heredan la protección:
       // no hay que repetir el guard en cada una.
       {
@@ -37,6 +43,7 @@ export const router = createBrowserRouter([
               { index: true, element: <AdminDashboardPage /> },
               { path: 'galerias', element: <GalleriesPage /> },
               { path: 'galerias/:galleryId', element: <GalleryDetailPage /> },
+              { path: 'usuarios', element: <UsersPage /> },
             ],
           },
         ],

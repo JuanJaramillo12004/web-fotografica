@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 const adminNav = [
   { to: '/admin', label: 'Resumen', end: true },
   { to: '/admin/galerias', label: 'Galerías', end: false },
+  { to: '/admin/usuarios', label: 'Usuarios', end: false },
 ]
 
 export function AdminLayout() {

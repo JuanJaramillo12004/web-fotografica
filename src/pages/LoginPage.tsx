@@ -87,10 +87,6 @@ export function LoginPage() {
           </form>
         </CardContent>
       </Card>
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">
-        Las cuentas se gestionan en Supabase → Authentication.
-      </p>
     </div>
   )
 }

@@ -7,7 +7,7 @@ export interface AuthContextValue {
   user: User | null
   isAuthenticated: boolean
   login: (credentials: Credentials) => Promise<LoginResult>
-  logout: () => void
+  logout: () => Promise<void>
   hasRole: (roles: readonly Role[]) => boolean
 }
 

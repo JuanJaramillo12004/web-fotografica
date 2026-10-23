@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
-import { DEMO_CREDENTIALS } from '@/lib/auth'
 import { getRedirectPath } from '@/lib/navigation'
 
 export function LoginPage() {
@@ -89,18 +88,9 @@ export function LoginPage() {
         </CardContent>
       </Card>
 
-      <div className="mt-6 rounded-lg border border-dashed border-border p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Credenciales de prueba
-        </p>
-        <ul className="mt-2 flex flex-col gap-1 text-xs text-muted-foreground">
-          {DEMO_CREDENTIALS.map((account) => (
-            <li key={account.email} className="font-mono">
-              {account.role}: {account.email} / {account.password}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        Las cuentas se gestionan en Supabase → Authentication.
+      </p>
     </div>
   )
 }

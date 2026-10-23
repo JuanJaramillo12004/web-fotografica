@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Variables de entorno (nunca commitear claves)
+.env
+.env.*
+!.env.example
+
+# Estado local de la CLI de Supabase
+supabase/.temp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
